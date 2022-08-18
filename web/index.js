@@ -115,12 +115,11 @@ export async function createServer(
     }
 
     let securityKey = 'Q*MKZZNnUjV7rFbFohQh5S*cGAr@bnW%';
-    let uri = `https://localhost:44301/api/services/app/shopify/GetShopifyInstallationStatus?shop=${session.shop}&securityKey=${securityKey}`;
+    let uri = `https://service.primepenguin.com/api/services/app/shopify/GetShopifyInstallationStatus?shop=${session.shop}&securityKey=${securityKey}`;
     const httpsAgent = new https.Agent({ rejectUnauthorized: false });
     let response = await fetch(uri, { method: 'GET', agent: httpsAgent });
     let data = await response.json();
-    // res.status(200).json(data.result);
-    res.status(200).json(101);
+    res.status(200).json(data.result);
   });
 
   // All endpoints after this point will have access to a request.body
