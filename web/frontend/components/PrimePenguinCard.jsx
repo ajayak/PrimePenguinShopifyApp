@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  Card,
-  TextContainer,
-  Loading,
-  Frame,
-  CalloutCard,
-  Link,
-  List
-} from "@shopify/polaris";
+import { Card, TextContainer, Loading, Frame, CalloutCard, Link, List } from "@shopify/polaris";
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 
 const installationStatus =
@@ -26,7 +18,7 @@ export function PrimePenguinCard() {
 
   const {
     data: status,
-    refetch: refetchProductCount,
+    refetch: refetchInstallationStatus,
     isLoading: isLoadingStatus,
     isRefetching: isRefetching,
   } = useAppQuery({
@@ -40,21 +32,11 @@ export function PrimePenguinCard() {
 
   const { data: storeInfo } = useAppQuery({ url: "/api/auth/info" });
 
-  const handlePopulate = async () => {
-    setIsLoading(true);
-    const response = await fetch("/api/products/create");
-
-    if (response.ok) {
-      await refetchProductCount();
-      setToastProps({ content: "5 products created!" });
-    } else {
-      setIsLoading(false);
-      setToastProps({
-        content: "There was an error creating products",
-        error: true,
-      });
-    }
-  };
+  if (status === installationStatus.Installing && !isRefetching && !isLoadingStatus) {
+    setTimeout(() => {
+      refetchInstallationStatus();
+    }, 5000);
+  }
 
   return (
     <Frame>
