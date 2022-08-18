@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@shopify/app": "3.6.2",
-    "@shopify/cli": "3.6.2"
+    "@shopify/cli": "3.6.2",
+    "node-fetch": "^3.2.10"
   },
   "author": "Ajay Kumar"
 }

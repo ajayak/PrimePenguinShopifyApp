@@ -1,2 +1,2 @@
-export { ProductsCard } from "./ProductsCard";
+export { PrimePenguinCard } from "./PrimePenguinCard";
 export * from "./providers";

@@ -18,14 +18,14 @@ export default function App() {
       <BrowserRouter>
         <AppBridgeProvider>
           <QueryProvider>
-            <NavigationMenu
+            {/* <NavigationMenu
               navigationLinks={[
                 {
                   label: "Prime Penguin",
                   destination: "/pagename",
                 },
               ]}
-            />
+            /> */}
             <Routes pages={pages} />
           </QueryProvider>
         </AppBridgeProvider>

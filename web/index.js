@@ -4,6 +4,8 @@ import fs from "fs";
 import express from "express";
 import cookieParser from "cookie-parser";
 import { Shopify, ApiVersion } from "@shopify/shopify-api";
+import fetch from 'node-fetch';
+import * as https from 'https';
 
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
@@ -92,37 +94,33 @@ export async function createServer(
     })
   );
 
-  app.get("/api/products/count", async (req, res) => {
-    const session = await Shopify.Utils.loadCurrentSession(
-      req,
-      res,
-      app.get("use-online-tokens")
-    );
-    const { Product } = await import(
-      `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
-    );
-
-    const countData = await Product.count({ session });
-    res.status(200).send(countData);
+  app.get("/api/auth/info", async (req, res) => {
+    const session = await Shopify.Utils.loadCurrentSession(req, res, app.get("use-online-tokens"));
+    if (!session) {
+      res.status(500);
+      return res.send("No shop provided");
+    }
+    let result = {
+      shop: session.shop,
+      token: session.accessToken
+    };
+    res.status(200).json(result);
   });
 
-  app.get("/api/products/create", async (req, res) => {
-    const session = await Shopify.Utils.loadCurrentSession(
-      req,
-      res,
-      app.get("use-online-tokens")
-    );
-    let status = 200;
-    let error = null;
-
-    try {
-      await productCreator(session);
-    } catch (e) {
-      console.log(`Failed to process products/create: ${e.message}`);
-      status = 500;
-      error = e.message;
+  app.get("/api/auth/installationStatus", async (req, res) => {
+    const session = await Shopify.Utils.loadCurrentSession(req, res, app.get("use-online-tokens"));
+    if (!session) {
+      res.status(500);
+      return res.send("No shop provided");
     }
-    res.status(status).send({ success: status === 200, error });
+
+    let securityKey = 'Q*MKZZNnUjV7rFbFohQh5S*cGAr@bnW%';
+    let uri = `https://localhost:44301/api/services/app/shopify/GetShopifyInstallationStatus?shop=${session.shop}&securityKey=${securityKey}`;
+    const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+    let response = await fetch(uri, { method: 'GET', agent: httpsAgent });
+    let data = await response.json();
+    // res.status(200).json(data.result);
+    res.status(200).json(101);
   });
 
   // All endpoints after this point will have access to a request.body
