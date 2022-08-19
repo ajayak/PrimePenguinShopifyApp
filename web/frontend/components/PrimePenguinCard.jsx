@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Card, TextContainer, Loading, Frame, CalloutCard, Link, List } from "@shopify/polaris";
+import { Card, TextContainer, Loading, Frame, CalloutCard, Link, TextStyle } from "@shopify/polaris";
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
+import { NotInstalledCard } from './NotInstalledCard';
 
 const installationStatus =
 {
@@ -30,8 +31,6 @@ export function PrimePenguinCard() {
     },
   });
 
-  const { data: storeInfo } = useAppQuery({ url: "/api/auth/info" });
-
   if (status === installationStatus.Installing && !isRefetching && !isLoadingStatus) {
     setTimeout(() => {
       refetchInstallationStatus();
@@ -57,30 +56,7 @@ export function PrimePenguinCard() {
       }
 
       {!isLoading && status === installationStatus.NotInstalled &&
-        <Card
-          title="Not Connected"
-          sectioned
-        >
-          <TextContainer spacing="loose">
-            {storeInfo && <p>
-              Your store is not connected to <Link url="https://app.primepenguin.com/">Prime Penguin</Link> yet. <br />
-              Please follow the instructions below to link your Shopify store to Prime Penguin: <br />
-              <List type="bullet">
-                <List.Item>Login at <Link url="https://app.primepenguin.com/">https://app.primepenguin.com/</Link></List.Item>
-                <List.Item>Go to Integration &gt; Sales Channel page and click on "Connect" button under Shopify</List.Item>
-                <List.Item>Select Manual Installation tab</List.Item>
-                <List.Item>Enter Shop name - <b>{storeInfo.shop.replace('.myshopify.com', '')}</b></List.Item>
-                <List.Item>Enter Access Token - <b>{storeInfo.token}</b></List.Item>
-                <List.Item>Click on the save button and your store will be connected.</List.Item>
-              </List>
-
-              <br />
-              <p>
-                For any assistance, please write to <b>support@primepenguin.com</b>
-              </p>
-            </p>}
-          </TextContainer>
-        </Card>
+        <NotInstalledCard></NotInstalledCard>
       }
 
       {!isLoading && status === installationStatus.Installed &&
@@ -127,7 +103,7 @@ export function PrimePenguinCard() {
           <p>
             There appears to be some problem with the connection to Prime Penguin. <br />
             Don't worry, we get you covered! <br />
-            Please write to <b>support@primepenguin.com</b> to get the issue resolved ASAP.
+            Please write to <TextStyle variation="strong">support@primepenguin.com</TextStyle> to get the issue resolved ASAP.
           </p>
         </CalloutCard>
       }

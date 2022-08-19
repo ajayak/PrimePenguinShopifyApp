@@ -9,8 +9,6 @@ import * as https from 'https';
 
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
-import productCreator from "./helpers/product-creator.js";
-import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
 
 const USE_ONLINE_TOKENS = false;
@@ -24,10 +22,27 @@ const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
+let scopes = [
+  // "read_all_orders",
+  "read_orders",
+  "read_customers",
+  "read_products",
+  "write_orders",
+  "write_products",
+  "read_fulfillments",
+  "read_inventory",
+  "read_shipping",
+  "write_fulfillments",
+  "write_inventory",
+  "read_locations",
+  "read_merchant_managed_fulfillment_orders",
+  "write_merchant_managed_fulfillment_orders"
+];
+
 Shopify.Context.initialize({
   API_KEY: process.env.SHOPIFY_API_KEY,
   API_SECRET_KEY: process.env.SHOPIFY_API_SECRET,
-  SCOPES: process.env.SCOPES.split(","),
+  SCOPES: scopes,
   HOST_NAME: process.env.HOST.replace(/https?:\/\//, ""),
   HOST_SCHEME: process.env.HOST.split("://")[0],
   API_VERSION: ApiVersion.July22,
@@ -100,9 +115,21 @@ export async function createServer(
       res.status(500);
       return res.send("No shop provided");
     }
+
+    var weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    const { Product, Order } = await import(
+      `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
+    );
+    const product = await Product.count({ session });
+    const order = await Order.count({ session, status: 'any', created_at_min: weekAgo.toISOString() });
+
     let result = {
       shop: session.shop,
-      token: session.accessToken
+      token: session.accessToken,
+      productCount: product.count,
+      orderCount: order.count
     };
     res.status(200).json(result);
   });
