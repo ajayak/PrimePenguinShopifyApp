@@ -224,3 +224,13 @@ pnpm dev --tunnel-url https://tunnel-url:3000
 - [App authentication](https://shopify.dev/apps/auth)
 - [Shopify CLI](https://shopify.dev/apps/tools/cli)
 - [Shopify API Library documentation](https://github.com/Shopify/shopify-api-node/tree/main/docs)
+
+## Push to Heroku
+```shell
+git push heroku master
+```
+
+## Configure environment variables
+```shell
+heroku config:set NODE_ENV=production SHOPIFY_API_SECRET=SECRET SHOPIFY_API_KEY=KEY HOST=https://primepenguin.herokuapp.com SCOPES=read_orders,read_customers,read_products,write_orders,write_products,read_fulfillments,read_inventory,read_shipping,write_fulfillments,write_inventory,read_locations,read_merchant_managed_fulfillment_orders,write_merchant_managed_fulfillment_orders
+```
