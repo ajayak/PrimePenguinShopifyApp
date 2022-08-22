@@ -142,8 +142,9 @@ export async function createServer(
       return res.send("No shop provided");
     }
 
+    let shop = session.shop.replace('.myshopify.com', '');
     let securityKey = 'Q*MKZZNnUjV7rFbFohQh5S*cGAr@bnW%';
-    let uri = `https://service.primepenguin.com/api/services/app/shopify/GetShopifyInstallationStatus?shop=${session.shop}&securityKey=${securityKey}`;
+    let uri = `https://service.primepenguin.com/api/services/app/shopify/GetShopifyInstallationStatus?shop=${shop}&securityKey=${securityKey}`;
     const httpsAgent = new https.Agent({ rejectUnauthorized: false });
     let response = await fetch(uri, { method: 'GET', agent: httpsAgent });
     let data = await response.json();
