@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, TextContainer, Loading, Frame, CalloutCard, Link, TextStyle } from "@shopify/polaris";
+import { Loading, Frame, CalloutCard, Link, TextStyle } from "@shopify/polaris";
 import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 import { NotInstalledCard } from './NotInstalledCard';
 

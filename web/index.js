@@ -76,6 +76,7 @@ export async function createServer(
   billingSettings = BILLING_SETTINGS
 ) {
   const app = express();
+  app.disable('etag');
   app.set("top-level-oauth-cookie", TOP_LEVEL_OAUTH_COOKIE);
   app.set("use-online-tokens", USE_ONLINE_TOKENS);
 
