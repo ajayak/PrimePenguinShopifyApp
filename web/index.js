@@ -38,9 +38,6 @@ let scopes = [
   "read_merchant_managed_fulfillment_orders",
   "write_merchant_managed_fulfillment_orders"
 ];
-// if (process.env.NODE_ENV === "production") {
-//   scopes.push("read_all_orders");
-// }
 
 Shopify.Context.initialize({
   API_KEY: process.env.SHOPIFY_API_KEY,
@@ -144,9 +141,8 @@ export async function createServer(
       return res.send("No shop provided");
     }
 
-    let baseUri = process.env.NODE_ENV === "production" ? "service.primepenguin.com" : "localhost:44301";
     let securityKey = 'Q*MKZZNnUjV7rFbFohQh5S*cGAr@bnW%';
-    let uri = `https://${baseUri}/api/services/app/shopify/GetShopifyInstallationStatus?shop=${session.shop}&securityKey=${securityKey}`;
+    let uri = `https://service.primepenguin.com/api/services/app/shopify/GetShopifyInstallationStatus?shop=${session.shop}&securityKey=${securityKey}`;
     const httpsAgent = new https.Agent({ rejectUnauthorized: false });
     let response = await fetch(uri, { method: 'GET', agent: httpsAgent });
     let data = await response.json();
