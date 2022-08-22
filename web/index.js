@@ -38,9 +38,9 @@ let scopes = [
   "read_merchant_managed_fulfillment_orders",
   "write_merchant_managed_fulfillment_orders"
 ];
-if (process.env.NODE_ENV === "production") {
-  scopes.push("read_all_orders");
-}
+// if (process.env.NODE_ENV === "production") {
+//   scopes.push("read_all_orders");
+// }
 
 Shopify.Context.initialize({
   API_KEY: process.env.SHOPIFY_API_KEY,
