@@ -31,7 +31,8 @@ export function PrimePenguinCard() {
     },
   });
 
-  if (status === installationStatus.Installing && !isRefetching && !isLoadingStatus) {
+  if ((status === installationStatus.Installing || status === installationStatus.NotInstalled)
+    && !isRefetching && !isLoadingStatus) {
     setTimeout(() => {
       refetchInstallationStatus();
     }, 5000);

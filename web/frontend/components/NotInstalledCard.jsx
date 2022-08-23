@@ -1,4 +1,4 @@
-import { Card, TextContainer, Heading, Link, List, DisplayText, TextStyle } from "@shopify/polaris";
+import { Card, TextContainer, Heading, Link, DisplayText, TextStyle, DescriptionList, AccountConnection } from "@shopify/polaris";
 import { useAppQuery } from "../hooks";
 
 export function NotInstalledCard() {
@@ -12,54 +12,83 @@ export function NotInstalledCard() {
         return 'Less than 15 minute';
     }
 
+    const terms = <p>
+        By clicking <strong>Connect</strong>, you agree to accept Prime Penguin App's{' '}
+        <Link external="true"
+            url="https://docs.google.com/document/d/e/2PACX-1vSJ3gpmynDnvxM_Aa3bHxdYhElI9ggw7trgiJxeJc6uWvVkkoek2D1k_1DMfWrrkpn_48ppkQoOZtv8/pub?embedded=true"
+        >terms and conditions</Link>.
+    </p>
+
     return (
         <>
-            <Card
-                title="Not Connected"
-                sectioned
-            >
-                <TextContainer spacing="loose">
-                    {storeInfo && <>
-                        <p>
-                            Your store is not connected to <Link url="https://app.primepenguin.com/">Prime Penguin</Link> yet. <br />
-                            Please follow the instructions below to link your Shopify store to Prime Penguin: <br />
-                        </p>
-                        <List type="bullet">
-                            <List.Item>Login at <Link url="https://app.primepenguin.com/">https://app.primepenguin.com/</Link></List.Item>
-                            <List.Item>Go to Integration &gt; Sales Channel page and click on "Connect" button under Shopify</List.Item>
-                            <List.Item>Select Manual Installation tab</List.Item>
-                            <List.Item>Enter Shop name - <TextStyle variation="strong">{storeInfo.shop.replace('.myshopify.com', '')}</TextStyle></List.Item>
-                            <List.Item>Enter Access Token - <TextStyle variation="strong">{storeInfo.token}</TextStyle></List.Item>
-                            <List.Item>Click on the save button and your store will be connected.</List.Item>
-                        </List>
+            {storeInfo && <>
+                <AccountConnection
+                    accountName="Prime Penguin"
+                    connected="Not connected"
+                    title="Prime Penguin"
+                    action={{
+                        content: "Connect",
+                        external: false,
+                        url: `https://service.primepenguin.com/api/services/app/shopify/RedirectInstallShopify?shop=${storeInfo.shop}`
+                    }}
+                    details="Not connected"
+                    termsOfService={terms}
+                    avatarUrl="https://app.primepenguin.com/assets/common/images/app-logo-on-light.svg"
+                />
 
-                        <p>
-                            For any assistance, please write to <TextStyle variation="strong">support@primepenguin.com</TextStyle>
-                        </p>
-                    </>}
-                </TextContainer>
-            </Card>
-            <Card
-                title="Estimated Time"
-                sectioned
-            >
-                <TextContainer spacing="loose">
-                    {storeInfo && <>
-                        <p>
-                            Total Products - <TextStyle variation="strong">{storeInfo.productCount}</TextStyle> <br />
-                            Total Orders (Past 7 days) - <TextStyle variation="strong">{storeInfo.orderCount}</TextStyle> <br />
-                        </p>
+                <Card
+                    title="Alternate way to connect"
+                    sectioned
+                >
+                    <DescriptionList
+                        items={[
+                            {
+                                term: <DisplayText size="small"><TextStyle variation="strong">Step 1</TextStyle></DisplayText>,
+                                description: <>
+                                    <>
+                                        Login at <Link url="https://app.primepenguin.com/">https://app.primepenguin.com/</Link>. <br />
+                                        Make sure to set your Company name before entering your Prime Penguin credentials.
+                                    </>
+                                </>
+                            },
+                            {
+                                term: <DisplayText size="small"><TextStyle variation="strong">Step 2</TextStyle></DisplayText>,
+                                description: <>
+                                    Go to Integration &gt; Sales Channel page from the left sidebar and click on "Connect" button under Shopify
+                                </>
+                            },
+                            {
+                                term: <DisplayText size="small"><TextStyle variation="strong">Step 3</TextStyle></DisplayText>,
+                                description: <>
+                                    Enter your shop name and click on "Save" button. <br />
+                                    Make sure you have SKU assigned for ev every product for the warehouse to identify the product.
+                                </>
+                            },
+                        ]}
+                    />
+                </Card>
+
+                <Card
+                    title={
                         <Heading element="h4">
                             Estimated time to connect
-                            <DisplayText size="medium">
+                            <DisplayText size="small">
                                 <TextStyle variation="strong">
                                     {getEstimatedTimeToConnect(storeInfo.productCount, storeInfo.orderCount)}
                                 </TextStyle>
                             </DisplayText>
                         </Heading>
-                    </>}
-                </TextContainer>
-            </Card>
+                    }
+                    sectioned
+                >
+                    <TextContainer spacing="loose">
+                        <p>
+                            Total Products - <TextStyle variation="strong">{storeInfo.productCount}</TextStyle> <br />
+                            Total Orders (Past 7 days) - <TextStyle variation="strong">{storeInfo.orderCount}</TextStyle>
+                        </p>
+                    </TextContainer>
+                </Card>
+            </>}
         </>
     );
 }

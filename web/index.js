@@ -23,7 +23,7 @@ const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
 let scopes = [
-  // "read_all_orders",
+  "read_all_orders",
   "read_orders",
   "read_customers",
   "read_products",
@@ -128,7 +128,6 @@ export async function createServer(
 
     let result = {
       shop: session.shop,
-      token: session.accessToken,
       productCount: product.count,
       orderCount: order.count
     };
