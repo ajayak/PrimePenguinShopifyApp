@@ -22,27 +22,27 @@ const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
 
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
-let scopes = [
-  "read_all_orders",
-  "read_orders",
-  "read_customers",
-  "read_products",
-  "write_orders",
-  "write_products",
-  "read_fulfillments",
-  "read_inventory",
-  "read_shipping",
-  "write_fulfillments",
-  "write_inventory",
-  "read_locations",
-  "read_merchant_managed_fulfillment_orders",
-  "write_merchant_managed_fulfillment_orders"
-];
+// let scopes = [
+//   "read_all_orders",
+//   "read_orders",
+//   "read_customers",
+//   "read_products",
+//   "write_orders",
+//   "write_products",
+//   "read_fulfillments",
+//   "read_inventory",
+//   "read_shipping",
+//   "write_fulfillments",
+//   "write_inventory",
+//   "read_locations",
+//   "read_merchant_managed_fulfillment_orders",
+//   "write_merchant_managed_fulfillment_orders"
+// ];
 
 Shopify.Context.initialize({
   API_KEY: process.env.SHOPIFY_API_KEY,
   API_SECRET_KEY: process.env.SHOPIFY_API_SECRET,
-  SCOPES: scopes,
+  SCOPES: process.env.SCOPES,
   HOST_NAME: process.env.HOST.replace(/https?:\/\//, ""),
   HOST_SCHEME: process.env.HOST.split("://")[0],
   API_VERSION: ApiVersion.April22,
