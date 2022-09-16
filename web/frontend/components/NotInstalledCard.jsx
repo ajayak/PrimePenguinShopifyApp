@@ -1,8 +1,8 @@
 import { Card, TextContainer, Heading, Link, DisplayText, TextStyle, DescriptionList, AccountConnection } from "@shopify/polaris";
 import { useAppQuery } from "../hooks";
 
-export function NotInstalledCard() {
-    const { data: storeInfo } = useAppQuery({ url: "/api/auth/info" });
+export function NotInstalledCard({ installationSecret }) {
+    const { data: storeInfo } = useAppQuery({ url: "/api/shop/info" });
 
     function getEstimatedTimeToConnect(productCount, orderCount) {
         let total = (productCount * 2) + orderCount;
@@ -22,22 +22,8 @@ export function NotInstalledCard() {
     return (
         <>
             {storeInfo && <>
-                <AccountConnection
-                    accountName="Prime Penguin"
-                    connected="Not connected"
-                    title="Prime Penguin"
-                    action={{
-                        content: "Connect",
-                        external: false,
-                        url: `https://service.primepenguin.com/api/services/app/shopify/RedirectInstallShopify?shop=${storeInfo.shop}`
-                    }}
-                    details="Not connected"
-                    termsOfService={terms}
-                    avatarUrl="https://app.primepenguin.com/assets/common/images/app-logo-on-light.svg"
-                />
-
                 <Card
-                    title="Alternate way to connect"
+                    title="Steps to connect to Prime Penguin"
                     sectioned
                 >
                     <DescriptionList
@@ -60,8 +46,14 @@ export function NotInstalledCard() {
                             {
                                 term: <DisplayText size="small"><TextStyle variation="strong">Step 3</TextStyle></DisplayText>,
                                 description: <>
-                                    Enter your shop name and click on "Save" button. <br />
-                                    Make sure you have SKU assigned for ev every product for the warehouse to identify the product.
+                                    Select the "Manual" tab.
+                                </>
+                            },
+                            {
+                                term: <DisplayText size="small"><TextStyle variation="strong">Step 4</TextStyle></DisplayText>,
+                                description: <>
+                                    Copy the following "Installation Secret" and paste it in the installation secret input box and hit the save button.<br />
+                                    <DisplayText size="small"><TextStyle variation="code">{installationSecret}</TextStyle></DisplayText>
                                 </>
                             },
                         ]}

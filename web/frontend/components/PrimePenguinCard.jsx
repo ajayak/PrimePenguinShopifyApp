@@ -15,7 +15,19 @@ const installationStatus =
 
 export function PrimePenguinCard() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isConnectingApp, setIsConnecting] = useState(true);
   const fetch = useAuthenticatedFetch();
+
+  const {
+    isLoading: isConnecting
+  } = useAppQuery({
+    url: "/api/primepenguin/connect",
+    reactQueryOptions: {
+      onSuccess: () => {
+        setIsConnecting(false);
+      },
+    },
+  });
 
   const {
     data: status,
@@ -23,7 +35,7 @@ export function PrimePenguinCard() {
     isLoading: isLoadingStatus,
     isRefetching: isRefetching,
   } = useAppQuery({
-    url: "/api/auth/installationStatus",
+    url: "/api/primepenguin/installationStatus",
     reactQueryOptions: {
       onSuccess: () => {
         setIsLoading(false);
@@ -31,8 +43,16 @@ export function PrimePenguinCard() {
     },
   });
 
-  if ((status === installationStatus.Installing || status === installationStatus.NotInstalled)
-    && !isRefetching && !isLoadingStatus) {
+  function shouldFetchInstallationStatus() {
+    if (!status) return false;
+    let s = status.salesChannelInstallationStatus;
+    if ((s === installationStatus.Installing || s === installationStatus.NotInstalled || s === installationStatus.Invalid) && !isRefetching && !isLoadingStatus) {
+      return true;
+    }
+    return false;
+  }
+
+  if (shouldFetchInstallationStatus()) {
     setTimeout(() => {
       refetchInstallationStatus();
     }, 5000);
@@ -56,11 +76,11 @@ export function PrimePenguinCard() {
         </CalloutCard>
       }
 
-      {!isLoading && status === installationStatus.NotInstalled &&
-        <NotInstalledCard></NotInstalledCard>
+      {!isLoading && status && status.salesChannelInstallationStatus === installationStatus.NotInstalled &&
+        <NotInstalledCard installationSecret={status.installationSecret}></NotInstalledCard>
       }
 
-      {!isLoading && status === installationStatus.Installed &&
+      {!isLoading && status && status.salesChannelInstallationStatus === installationStatus.Installed &&
         <CalloutCard
           title="Connected"
           illustration="https://app.primepenguin.com/assets/common/images/app-logo-on-light.svg"
@@ -76,7 +96,7 @@ export function PrimePenguinCard() {
         </CalloutCard>
       }
 
-      {!isLoading && status === installationStatus.Installing &&
+      {!isLoading && status && status.salesChannelInstallationStatus === installationStatus.Installing &&
         <CalloutCard
           title="Installing..."
           illustration="https://app.primepenguin.com/assets/common/images/app-logo-on-light.svg"
@@ -91,24 +111,6 @@ export function PrimePenguinCard() {
           </p>
         </CalloutCard>
       }
-
-      {!isLoading && (status === installationStatus.UnInstalling || status === installationStatus.Uninstalled || status === installationStatus.Invalid) &&
-        <CalloutCard
-          title="Uh Oh!"
-          illustration="https://app.primepenguin.com/assets/common/images/app-logo-on-light.svg"
-          primaryAction={{
-            content: 'Visit Prime Penguin',
-            url: 'https://app.primepenguin.com/',
-          }}
-        >
-          <p>
-            There appears to be some problem with the connection to Prime Penguin. <br />
-            Don't worry, we get you covered! <br />
-            Please write to <TextStyle variation="strong">support@primepenguin.com</TextStyle> to get the issue resolved ASAP.
-          </p>
-        </CalloutCard>
-      }
-
     </Frame>
   );
 }

@@ -13,6 +13,7 @@ import { AppInstallations } from "./app_installations.js";
 
 const USE_ONLINE_TOKENS = false;
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
+const SECURITY_KEY = 'Q*MKZZNnUjV7rFbFohQh5S*cGAr@bnW%';
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
@@ -23,7 +24,7 @@ const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
 const DB_PATH = `${process.cwd()}/database.sqlite`;
 
 // let scopes = [
-//   "read_all_orders",
+//   // "read_all_orders",
 //   "read_orders",
 //   "read_customers",
 //   "read_products",
@@ -110,7 +111,7 @@ export async function createServer(
     })
   );
 
-  app.get("/api/auth/info", async (req, res) => {
+  app.get("/api/shop/info", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, app.get("use-online-tokens"));
     if (!session) {
       res.status(500);
@@ -127,14 +128,13 @@ export async function createServer(
     const order = await Order.count({ session, status: 'any', created_at_min: weekAgo.toISOString() });
 
     let result = {
-      shop: session.shop,
       productCount: product.count,
       orderCount: order.count
     };
     res.status(200).json(result);
   });
 
-  app.get("/api/auth/installationStatus", async (req, res) => {
+  app.get("/api/primepenguin/installationStatus", async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, app.get("use-online-tokens"));
     if (!session) {
       res.status(500);
@@ -142,12 +142,34 @@ export async function createServer(
     }
 
     let shop = session.shop.replace('.myshopify.com', '');
-    let securityKey = 'Q*MKZZNnUjV7rFbFohQh5S*cGAr@bnW%';
-    let uri = `https://service.primepenguin.com/api/services/app/shopify/GetShopifyInstallationStatus?shop=${shop}&securityKey=${securityKey}`;
+    let uri = `https://service.primepenguin.com/api/services/app/shopify/GetShopifyInstallationStatus?shop=${shop}&securityKey=${SECURITY_KEY}`;
     const httpsAgent = new https.Agent({ rejectUnauthorized: false });
     let response = await fetch(uri, { method: 'GET', agent: httpsAgent });
     let data = await response.json();
     res.status(200).json(data.result);
+  });
+
+  app.get("/api/primepenguin/connect", async (req, res) => {
+    const session = await Shopify.Utils.loadCurrentSession(req, res, app.get("use-online-tokens"));
+    if (!session) {
+      res.status(500);
+      return res.send("No shop provided");
+    }
+
+    let body = {
+      ShopName: session.shop,
+      AccessToken: session.accessToken,
+      SecurityKey: SECURITY_KEY
+    };
+
+    let uri = `https://service.primepenguin.com/api/services/app/shopify/ShopifyNewAppInstallation`;
+    const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+    await fetch(uri, {
+      method: 'POST', agent: httpsAgent,
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    res.status(200).json({ result: "OK" });
   });
 
   // All endpoints after this point will have access to a request.body
