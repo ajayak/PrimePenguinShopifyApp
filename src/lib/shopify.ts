@@ -8,7 +8,7 @@ Shopify.Context.initialize({
     SCOPES: process.env.SCOPES.split(','),
     HOST_NAME: process.env.HOST.replace(/https:\/\//, ""),
     IS_EMBEDDED_APP: false,
-    API_VERSION: ApiVersion.April22,
+    API_VERSION: ApiVersion.October22,
     SESSION_STORAGE: SessionStorage
 })
 

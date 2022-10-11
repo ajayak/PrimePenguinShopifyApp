@@ -69,6 +69,7 @@ const nextConfig = async (phase) => {
 		env: {
 			HOST,
 		},
+		generateEtags: false,
 	};
 };
 

@@ -35,9 +35,12 @@ export default function GetData() {
     const getApi = async (e) => {
         e.preventDefault()
 
-        await fetch('/api/hello', {
+        await fetch('/api/primepenguin-installation-status', {
             method: "GET"
-        }).then(r => r.text()).then(r => setMessage(r))
+        }).then(r => r.text()).then(r => {
+            console.log(r);
+            setMessage(r);
+        })
     }
 
     return (
