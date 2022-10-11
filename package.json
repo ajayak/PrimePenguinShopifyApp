@@ -1,20 +1,31 @@
 {
-  "name": "primepenguin-development",
-  "version": "1.0.0",
-  "main": "web/index.js",
-  "license": "UNLICENSED",
+  "name": "shopify-non-embedded-app-template",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "shopify": "shopify",
-    "build": "shopify app build",
-    "dev": "shopify app dev",
-    "info": "shopify app info",
-    "scaffold": "shopify app scaffold",
-    "deploy": "shopify app deploy"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@shopify/app": "3.6.2",
-    "@shopify/cli": "3.6.2",
-    "node-fetch": "^3.2.10"
+    "@apollo/client": "^3.6.2",
+    "@shopify/cli-kit": "^3.0.24",
+    "@shopify/shopify-api": "^3.0.1",
+    "chalk": "^4.1.2",
+    "envfile": "^6.17.0",
+    "graphql": "^16.5.0",
+    "localtunnel": "^2.0.2",
+    "next": "12.1.6",
+    "ngrok": "^4.3.1",
+    "react": "18.1.0",
+    "react-dom": "18.1.0"
   },
-  "author": "Ajay Kumar"
+  "devDependencies": {
+    "@types/node": "^17.0.32",
+    "@types/react": "^18.0.9",
+    "eslint": "8.15.0",
+    "eslint-config-next": "12.1.6",
+    "typescript": "^4.6.4"
+  }
 }
