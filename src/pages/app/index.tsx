@@ -1,8 +1,9 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from 'src/styles/Home.module.css'
-import Link from "next/link";
 import { useState } from "react";
+import '@shopify/polaris/build/esm/styles.css';
+import { AppProvider } from "@shopify/polaris";
+import translations from "@shopify/polaris/locales/en.json";
+import { Loading, Frame, CalloutCard, Link, TextStyle, Page, Layout } from "@shopify/polaris";
+import { NotInstalledCard } from './NotInstalledCard';
 
 const IS =
 {
@@ -15,106 +16,131 @@ const IS =
 }
 
 export default function AppHome() {
-    const [isLoadingStatus, setIsLoadingStatus] = useState(false);
-    const [runningInterval, setRunningInterval] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingInstallationStatus, setIsLoadingInstallationStatus] = useState(false);
     const [status, setStatus] = useState(undefined);
+    const [connectionCallMade, setConnectionCallMade] = useState(false);
+    const [initialFetchComplete, setInitialFetchComplete] = useState(false);
 
-    async function getInstallationStatus() {
-        if (isLoadingStatus) return;
-        fetch('/api/primepenguin-installation-status', {
-            method: "GET"
-        }).then(r => r.text()).then(r => {
-            setStatus(r);
-            setIsLoadingStatus(false);
-        })
+    const connectPrimePenguinApp = () => {
+        if (connectionCallMade) return;
+        setConnectionCallMade(true);
+        fetch('/api/primepenguin-connect', { method: "GET" })
+            .then(r => r.json())
+            .then(r => {
+                console.log('Connection complete');
+                getInstallationStatus();
+            })
     }
 
-    function shouldFetchInstallationStatus() {
-        if (!status) return true;
-        let s = status.salesChannelInstallationStatus;
-        if ((s === IS.Installing || s === IS.NotInstalled || s === IS.Invalid) && !isLoadingStatus) {
-            return true;
-        }
-        return false;
+    const getInstallationStatus = () => {
+        if (isLoadingInstallationStatus) return;
+        setIsLoadingInstallationStatus(true);
+        fetch('/api/primepenguin-installation-status', { method: "GET" })
+            .then(r => r.json())
+            .then(r => {
+                console.log(r);
+                if (!connectionCallMade && r && r.salesChannelInstallationStatus === IS.Invalid) {
+                    connectPrimePenguinApp();
+                }
+                setInitialFetchComplete(true);
+                setIsLoadingInstallationStatus(false);
+                setStatus(r);
+                setIsLoading(false);
+            })
     }
 
-    if (shouldFetchInstallationStatus()) {
-        setTimeout(() => {
-            setRunningInterval(true);
-            getInstallationStatus();
-        }, 5000);
-    }
-
-    if (!runningInterval) {
+    if (!initialFetchComplete) {
         getInstallationStatus();
     }
 
     return (
-        <div className={styles.container}>
-            <Head>
-                <title>Prime Penguin Shopify App</title>
-                <meta name="description" content="Prime Penguin Shopify App" />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
+        <AppProvider i18n={translations}>
+            <Page>
+                <Frame>
+                    {isLoading && <Loading />}
 
-            <main className={styles.main}>
-                <h1 className={styles.title}>
-                    Welcome to your <a href="https://nextjs.org">Next.js</a> <a
-                        href='https://shopify.dev/apps'>Shopify</a> App!
-                </h1>
+                    {isLoading &&
+                        <CalloutCard
+                            title="Loading..."
+                            illustration="https://app.primepenguin.com/assets/common/images/app-logo-on-light.svg"
+                            primaryAction={{
+                                content: 'Know more about Prime Penguin',
+                                url: 'https://primepenguin.com/',
+                                external: true
+                            }}
+                        >
+                            <p>Please wait while we are loading the information.</p>
+                        </CalloutCard>
+                    }
 
-                <p className={styles.description}>
-                    Get started by editing{' '}
-                    <code className={styles.code}>pages/app/index.js</code>
-                </p>
+                    {!isLoading && status && status.salesChannelInstallationStatus === IS.NotInstalled &&
+                        <>
+                            <NotInstalledCard installationSecret={status.installationSecret}></NotInstalledCard>
+                            <CalloutCard
+                                title="Installation Status"
+                                illustration="https://app.primepenguin.com/assets/common/images/app-logo-on-light.svg"
+                                primaryAction={{
+                                    content: 'Check Connection Status',
+                                    onAction: getInstallationStatus
+                                }}
+                            >
+                                <p>
+                                    Click on the button to check the connection status
+                                </p>
+                            </CalloutCard>
+                        </>
+                    }
 
-                <div className={styles.grid}>
-                    <Link href="/app/get-data">
-                        <div className={styles.card}>
-                            <h2>Get Data &rarr;</h2>
-                            <p>Fetch data from Shopify&apos;s GraphQL Api or from your own endpoint.</p>
-                        </div>
-                    </Link>
+                    {!isLoading && status && status.salesChannelInstallationStatus === IS.Installed &&
+                        <CalloutCard
+                            title="Connected"
+                            illustration="https://app.primepenguin.com/assets/common/images/app-logo-on-light.svg"
+                            primaryAction={{
+                                content: 'Visit Prime Penguin',
+                                url: 'https://app.primepenguin.com/',
+                            }}
+                        >
+                            <p>
+                                Hurray Your store is connected to Prime Penguin <br />
+                                Visit <Link url="https://app.primepenguin.com/">https://app.primepenguin.com/</Link> to experience full set of features offered by Prime Penguin.
+                            </p>
+                        </CalloutCard>
+                    }
 
-                    <Link href="/app/subscriptions">
-                        <div className={styles.card}>
-                            <h2>Manage Billing &rarr;</h2>
-                            <p>Subscribe Merchants to recurring plans and view active subscriptions.</p>
-                        </div>
-                    </Link>
+                    {!isLoading && status && status.salesChannelInstallationStatus === IS.Installing &&
+                        <CalloutCard
+                            title="Installing..."
+                            illustration="https://app.primepenguin.com/assets/common/images/app-logo-on-light.svg"
+                            primaryAction={{
+                                content: 'Visit Prime Penguin',
+                                url: 'https://app.primepenguin.com/',
+                            }}
+                        >
+                            <p>
+                                Please wait while we connect your store to Prime Penguin. <br />
+                                Visit <Link url="https://app.primepenguin.com/">https://app.primepenguin.com/</Link> to experience full set of features offered by Prime Penguin.
+                            </p>
+                        </CalloutCard>
+                    }
 
-                    <a
-                        href="https://nextjs.org/docs"
-                        className={styles.card}
-                    >
-                        <h2>Documentation &rarr;</h2>
-                        <p>Find in-depth information about Next.js features and API.</p>
-                    </a>
-
-                    <a
-                        href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-                        className={styles.card}
-                    >
-                        <h2>Deploy &rarr;</h2>
-                        <p>
-                            Instantly deploy your Next.js site to a public URL with Vercel.
-                        </p>
-                    </a>
-                </div>
-            </main>
-
-            <footer className={styles.footer}>
-                <a
-                    href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Powered by{' '}
-                    <span className={styles.logo}>
-                        <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-                    </span>
-                </a>
-            </footer>
-        </div>
+                    {!isLoading && status && status.salesChannelInstallationStatus === IS.Invalid &&
+                        <CalloutCard
+                            title="Invalid..."
+                            illustration="https://app.primepenguin.com/assets/common/images/app-logo-on-light.svg"
+                            primaryAction={{
+                                content: 'Visit Prime Penguin',
+                                url: 'https://app.primepenguin.com/',
+                            }}
+                        >
+                            <p>
+                                Something went wrong. <br />
+                                Please contact Prime Penguin support.
+                            </p>
+                        </CalloutCard>
+                    }
+                </Frame>
+            </Page>
+        </AppProvider>
     )
 }
