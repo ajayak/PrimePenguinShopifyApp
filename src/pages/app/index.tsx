@@ -1,9 +1,10 @@
 import { useState } from "react";
+import axios from 'axios';
 import '@shopify/polaris/build/esm/styles.css';
 import { AppProvider } from "@shopify/polaris";
 import translations from "@shopify/polaris/locales/en.json";
 import { Loading, Frame, CalloutCard, Link, Page } from "@shopify/polaris";
-import { NotInstalledCard } from './NotInstalledCard';
+import NotInstalledCard from './NotInstalledCard';
 
 const IS =
 {
@@ -25,8 +26,7 @@ export default function AppHome() {
     const connectPrimePenguinApp = () => {
         if (connectionCallMade) return;
         setConnectionCallMade(true);
-        fetch('/api/primepenguin-connect', { method: "GET" })
-            .then(r => r.json())
+        axios.get('/api/primepenguin-connect')
             .then(r => {
                 console.log('Connection complete');
                 getInstallationStatus();
@@ -36,22 +36,20 @@ export default function AppHome() {
     const getInstallationStatus = () => {
         if (isLoadingInstallationStatus) return;
         setIsLoadingInstallationStatus(true);
-        fetch('/api/primepenguin-installation-status', { method: "GET" })
-            .then(r => r.json())
+        axios.get('/api/primepenguin-installation-status')
             .then(r => {
-                console.log(r);
-                if (!connectionCallMade && r && r.salesChannelInstallationStatus === IS.Invalid) {
+                if (!connectionCallMade && r && r.data.salesChannelInstallationStatus === IS.Invalid) {
                     connectPrimePenguinApp();
                 }
                 setInitialFetchComplete(true);
                 setIsLoadingInstallationStatus(false);
-                setStatus(r);
+                setStatus(r.data);
                 setIsLoading(false);
             })
     }
 
     if (!initialFetchComplete) {
-        getInstallationStatus();
+        setTimeout(() => getInstallationStatus(), 500);
     }
 
     return (
@@ -78,7 +76,7 @@ export default function AppHome() {
                         <>
                             <NotInstalledCard installationSecret={status.installationSecret}></NotInstalledCard>
                             <CalloutCard
-                                title="Installation Status"
+                                title="Installation Status - Not Connected"
                                 illustration="https://app.primepenguin.com/assets/common/images/app-logo-on-light.svg"
                                 primaryAction={{
                                     content: 'Check Connection Status',

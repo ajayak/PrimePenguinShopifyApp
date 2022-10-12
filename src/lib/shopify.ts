@@ -1,6 +1,5 @@
 import Shopify, {ApiVersion} from "@shopify/shopify-api";
 import SessionStorage from "./sessionStorage";
-import webhooks from "../webhooks";
 
 Shopify.Context.initialize({
     API_KEY: process.env.SHOPIFY_API_KEY,
@@ -11,7 +10,5 @@ Shopify.Context.initialize({
     API_VERSION: ApiVersion.October22,
     SESSION_STORAGE: SessionStorage
 })
-
-Shopify.Webhooks.Registry.addHandlers(webhooks)
 
 export default Shopify

@@ -1,6 +1,6 @@
 import Shopify from "@lib/shopify";
 import { ApiRequest, NextApiResponse } from "@types";
-import fetch from 'node-fetch';
+import axios from 'axios';
 import * as https from 'https';
 
 export default async function handler(req: ApiRequest, res: NextApiResponse) {
@@ -13,7 +13,6 @@ export default async function handler(req: ApiRequest, res: NextApiResponse) {
     let shop = session.shop.replace('.myshopify.com', '');
     const httpsAgent = new https.Agent({ rejectUnauthorized: false });
     let uri = `${process.env.PRIMEPENGUIN_URI}/api/services/app/shopify/GetShopifyInstallationStatus?shop=${shop}&securityKey=${process.env.SECURITY_KEY}`;
-    let response = await fetch(uri, { method: 'GET', agent: httpsAgent });
-    let data = await response.json();
-    res.status(200).json(data['result']);
+    let response = await axios.get(uri, { httpsAgent: httpsAgent });
+    res.status(200).json(response.data['result']);
 }

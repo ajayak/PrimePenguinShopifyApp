@@ -1,6 +1,6 @@
 import Shopify from "@lib/shopify";
 import { ApiRequest, NextApiResponse } from "@types";
-import fetch from 'node-fetch';
+import axios from 'axios';
 import * as https from 'https';
 
 export default async function handler(req: ApiRequest, res: NextApiResponse) {
@@ -18,11 +18,7 @@ export default async function handler(req: ApiRequest, res: NextApiResponse) {
 
     const httpsAgent = new https.Agent({ rejectUnauthorized: false });
     let uri = `${process.env.PRIMEPENGUIN_URI}/api/services/app/shopify/ShopifyNewAppInstallation`;
-    await fetch(uri, {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers: { 'Content-Type': 'application/json' },
-        agent: httpsAgent
-    });
+
+    await axios.post(uri, body, { httpsAgent: httpsAgent, headers: { 'Content-Type': 'application/json' } });
     return res.status(200).json({ result: "OK" });
 }

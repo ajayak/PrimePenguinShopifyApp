@@ -1,24 +1,26 @@
+import axios from 'axios';
 import { useState } from "react";
 import { Card, TextContainer, Heading, Link, DisplayText, TextStyle, DescriptionList, Loading, CalloutCard } from "@shopify/polaris";
 
-export function NotInstalledCard({ installationSecret }) {
+export default function NotInstalledCard({ installationSecret }) {
     const [isLoading, setIsLoading] = useState(false);
     const [storeInfo, setStoreInfo] = useState(undefined);
     const [initialFetchComplete, setInitialFetchComplete] = useState(false);
 
-    async function getShopInfo() {
+    const getShopInfo = async () => {
         if (isLoading) return;
-        fetch('/api/primepenguin-shop-info', { method: "GET" })
-            .then(r => r.json())
+
+        axios
+            .get('/api/primepenguin-shop-info')
             .then(r => {
                 setInitialFetchComplete(true);
-                setStoreInfo(r);
+                setStoreInfo(r.data);
                 setIsLoading(false);
-            })
+            });
     }
 
     if (!initialFetchComplete) {
-        getShopInfo();
+        setTimeout(() => getShopInfo(), 500);
     }
 
     function getEstimatedTimeToConnect(productCount, orderCount) {
