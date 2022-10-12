@@ -38,7 +38,10 @@ export default function AppHome() {
         setIsLoadingInstallationStatus(true);
         axios.get('/api/primepenguin-installation-status')
             .then(r => {
-                if (!connectionCallMade && r && r.data.salesChannelInstallationStatus === IS.Invalid) {
+                if (!connectionCallMade && r && (
+                    r.data.salesChannelInstallationStatus === IS.Invalid ||
+                    r.data.salesChannelInstallationStatus === IS.Uninstalled
+                )) {
                     connectPrimePenguinApp();
                 }
                 setInitialFetchComplete(true);
