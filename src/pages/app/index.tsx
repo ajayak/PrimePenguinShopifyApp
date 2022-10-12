@@ -2,7 +2,7 @@ import { useState } from "react";
 import '@shopify/polaris/build/esm/styles.css';
 import { AppProvider } from "@shopify/polaris";
 import translations from "@shopify/polaris/locales/en.json";
-import { Loading, Frame, CalloutCard, Link, TextStyle, Page, Layout } from "@shopify/polaris";
+import { Loading, Frame, CalloutCard, Link, Page } from "@shopify/polaris";
 import { NotInstalledCard } from './NotInstalledCard';
 
 const IS =
