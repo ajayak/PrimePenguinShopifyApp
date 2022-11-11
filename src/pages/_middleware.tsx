@@ -25,7 +25,7 @@ export async function middleware(req: NextRequest) {
 				);
 			}
 			console.log("Redirect to login");
-			return NextResponse.redirect(`${process.env.HOST}/login`);
+			return NextResponse.redirect(`${process.env.HOST}/login?shop=${shop.replace(".myshopify.com", "")}`);
 		} else {
 			const { result } = await fetch(
 				`${upstashRedisRestUrl}/get/${sessionId}`,
